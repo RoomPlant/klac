@@ -175,7 +175,7 @@ body {
   position: absolute;
   left: var(--klac-x);
   top: var(--klac-y);
-  z-index: 2;
+  z-index: 3;
   width: var(--klac-size);
   aspect-ratio: 1;
   border-radius: 50%;

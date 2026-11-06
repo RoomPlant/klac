@@ -1,0 +1,308 @@
+:root {
+  --pink: #ff9ac2;
+  --pink-dark: #ff6ea9;
+  --ink: #5a2140;
+  /* Scene geometry in source-video pixels (448 x 672), as stage percentages.
+     The button centre is (285, 365), diameter 190. */
+  --klac-x: 42.41%;
+  --klac-y: 40.18%;
+  --klac-size: 42.41%;
+  --slide: 2.6s;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--pink);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.scene {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden; /* the button starts beyond the right edge */
+}
+
+/* Decorative watermark: keep the pink base and all controls unobstructed. */
+.scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("assets/emblem.svg") center / min(94vw, 1100px) auto no-repeat;
+  filter: grayscale(1) brightness(0.45);
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+/* Fit the entire dance frame with 24px side margins, 28px above and
+   116px below for the loader controls. The source itself can contain crops. */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 44px);
+  width: min(calc(100vw - 48px), calc((100vh - 144px) / 1.5));
+  width: min(calc(100vw - 48px), calc((100svh - 144px) / 1.5));
+  aspect-ratio: 448 / 672;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+  transition: width var(--slide) ease-in-out, top var(--slide) ease-in-out,
+    transform var(--slide) ease-in-out;
+}
+
+/* After the dance the stage shifts so the button lands in the screen centre;
+   80vw keeps Batman's raised hand on narrow phones. */
+.scene--rest .stage {
+  top: 50%;
+  width: min(80vw, calc((100vh - 16px) / 1.5));
+  width: min(80vw, calc((100svh - 16px) / 1.5));
+  transform: translate(-63.6%, -54.3%);
+}
+
+.stage__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease;
+}
+
+.stage__poster, .stage__canvas { z-index: 1; }
+.scene--rest .stage__poster, .scene--rest .stage__canvas { opacity: 0; }
+
+/* Never show the lunar source frame, even before JS draws the first matte.
+   Keep the video in the document for inline decoding on mobile Safari. */
+.stage__source {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pose { opacity: 0; pointer-events: none; z-index: 1; }
+.scene--rest .pose { opacity: 1; }
+/* Arm and neck layers stay above the button in the frozen 0-second pose. */
+.pose--arm, .pose--neck { z-index: 3; }
+
+.speech {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.speech__bubble {
+  /* Head centres in the 448x672 frozen frame: Batman (156,188),
+     flamingo (348,213). Grow from the tail anchored to that point. */
+  --head-x: 34.82%;
+  --head-y: 27.98%;
+  position: absolute;
+  left: var(--head-x);
+  bottom: calc(100% - var(--head-y) + 9px);
+  width: min(54cqw, 270px);
+  margin: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 48% 44% 42% 30% / 26% 32% 30% 26%;
+  background: #fff9df;
+  color: #40142e;
+  box-shadow: 0 5px 0 #5a214026;
+  font-size: clamp(14px, 3.4cqw, 18px);
+  line-height: 1.35;
+  text-align: center;
+  overflow-wrap: anywhere;
+  transform: translateX(-50%);
+  transform-origin: 50% calc(100% + 9px);
+  animation: speech-rise 5.5s ease-out both;
+}
+.speech__bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 48%;
+  width: 14px;
+  height: 14px;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  background: inherit;
+  transform: skewY(35deg);
+}
+.speech__bubble--flamingo { --head-x: 77.68%; --head-y: 31.70%; background: #fff0f8; }
+@keyframes speech-rise {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.25); }
+  12% { opacity: 1; transform: translate(-50%, -8px) scale(1); }
+  65% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -100px); }
+}
+
+.gift-title {
+  position: absolute;
+  bottom: 85%;
+  left: 0;
+  z-index: 4;
+  width: 100%;
+  margin: 0;
+  color: #ffe644;
+  font-size: clamp(18px, 6cqw, 32px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+  -webkit-text-stroke: 1.5px #111;
+  paint-order: stroke fill;
+  text-shadow: 1px 1px 0 #111, 2px 2px 0 #111, 3px 3px 0 #111,
+    4px 4px 0 #9c6b00, 5px 5px 0 #111, 0 7px 8px rgba(90, 33, 64, 0.25);
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateY(-100vh);
+  transform: translateY(-100svh);
+  transition: transform var(--slide) cubic-bezier(.2, .7, .25, 1);
+}
+
+.gift-title span { display: block; }
+.scene--rest .gift-title { visibility: visible; transform: none; }
+
+.klac {
+  position: absolute;
+  left: var(--klac-x);
+  top: var(--klac-y);
+  z-index: 2;
+  width: var(--klac-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: max(4px, 1.6cqw) solid #fff;
+  background: var(--pink-dark);
+  box-shadow: 0 12px 30px rgba(90, 33, 64, 0.35);
+  color: #fff;
+  font-size: clamp(1.2rem, 9cqw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  visibility: hidden;
+  transform: translateX(100vw);
+  transition: transform var(--slide) cubic-bezier(.2, .7, .25, 1), scale 0.1s ease;
+}
+
+.scene--rest .klac { visibility: visible; transform: none; }
+.klac:active { scale: 0.94; }
+
+.loader {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.loader__text { margin: 0; font-size: 1.2rem; font-weight: 700; }
+.loader__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+.loader__button {
+  min-height: 44px;
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  padding: 9px 12px;
+  background: var(--ink);
+  color: white;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
+.hidden { display: none; }
+
+.reward {
+  width: min(440px, calc(100vw - 32px));
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  background: #fff0f7;
+  color: var(--ink);
+  box-shadow: 0 18px 65px #39132b66;
+  overflow: visible;
+}
+.reward::backdrop { background: #30122699; }
+.reward__content {
+  position: relative;
+  padding: 48px 24px 24px;
+  max-height: calc(100svh - 48px);
+  overflow: auto;
+  text-align: center;
+}
+.reward h2 { margin: 0 0 18px; font-size: clamp(22px, 6vw, 32px); font-weight: 900; }
+.reward p { font-size: 18px; line-height: 1.5; }
+.reward__close {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 32px;
+  cursor: pointer;
+}
+.reward__get {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  background: #ffe644;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.reward__get[hidden] { display: none; }
+.reward :is(button, a):focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti__piece {
+  position: absolute;
+  top: -24px;
+  width: 9px;
+  height: 15px;
+  border-radius: 2px;
+  animation: confetti-fall linear both;
+}
+@keyframes confetti-fall {
+  from { transform: translate3d(0, -20px, 0) rotate(0deg); }
+  to { transform: translate3d(var(--drift), calc(100vh + 48px), 0) rotate(720deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage, .stage__layer, .klac, .gift-title { transition: none; }
+  .confetti { display: none; }
+  .speech__bubble { animation: none; }
+}

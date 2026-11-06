@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Клац</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="scene" class="scene">
+      <div id="stage" class="stage">
+        <h1 class="gift-title"><span>Клацай 100 раз</span> <span>и получи подарок</span></h1>
+        <img id="dance-poster" class="stage__layer stage__poster" src="assets/loader-dance.poster.png"
+          width="448" height="672" alt="Розовый Бэтмен и фламинго танцуют" />
+        <canvas id="dance-canvas" class="stage__layer stage__canvas hidden" width="448" height="672"
+          role="img" aria-label="Бэтмен и фламинго из видео танцуют на розовом фоне"></canvas>
+        <!-- A single media clock keeps the original choreography and music in sync.
+             The source is only attached by JS when reduced motion is off. -->
+        <video id="dance-video" class="stage__source" data-src="assets/loader-dance.mp4"
+          preload="none" muted playsinline disablepictureinpicture
+          tabindex="-1" aria-hidden="true"></video>
+        <!-- Final scene: the frozen 0-second pose, layered around the button. -->
+        <img class="stage__layer pose pose--body" src="assets/pose-body.png" width="448" height="672"
+          alt="Бэтмен и фламинго стоят рядом с кнопкой" />
+        <img class="stage__layer pose pose--arm" src="assets/pose-arm.png" width="448" height="672" alt="" />
+        <img class="stage__layer pose pose--neck" src="assets/pose-neck.png" width="448" height="672" alt="" />
+        <button id="klac" class="klac" type="button">КЛАЦ</button>
+        <div id="speech" class="speech" aria-live="polite" aria-atomic="false"></div>
+      </div>
+
+      <div id="loader" class="loader" aria-busy="true" aria-label="Загрузка приложения">
+        <p id="loader-status" class="loader__text" role="status">Загрузка…</p>
+        <div class="loader__actions">
+          <button id="sound-toggle" class="loader__button" type="button" aria-pressed="false">
+            Включить музыку
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <dialog id="reward" class="reward" aria-labelledby="reward-title" aria-describedby="reward-description">
+      <div id="confetti" class="confetti" aria-hidden="true"></div>
+      <div class="reward__content">
+        <button id="reward-close" class="reward__close" type="button" aria-label="Закрыть поздравление">×</button>
+        <h2 id="reward-title">ТЫ МОЛОДЕЦ!</h2>
+        <p id="reward-description">Держи стикерпак с твоими любимыми героями by KsVs</p>
+        <a id="get-stickerpack" class="reward__get" href="https://t.me/addstickers/KsVsebudethorosho" target="_blank" rel="noopener noreferrer" autofocus>Получить стикерпак</a>
+        <a id="get-video" class="reward__get" href="assets/reward-dance.mp4" target="_blank" rel="noopener noreferrer" hidden>Получить видео</a>
+        <a id="get-postcard" class="reward__get" href="assets/postcard.png" target="_blank" rel="noopener noreferrer" hidden>Получить открытку</a>
+      </div>
+    </dialog>
+
+    <noscript><style>.loader, .stage__poster { display: none; } .scene .pose { opacity: 1; }
+      .scene .klac, .scene .gift-title { visibility: visible; transform: none; }</style>Для счётчика включите JavaScript.</noscript>
+    <audio id="click-audio" src="assets/click.wav" preload="auto"></audio>
+    <audio id="milestone-audio" src="assets/milestone-click.wav" preload="auto"></audio>
+    <script src="matte.js"></script>
+    <script src="quotes.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

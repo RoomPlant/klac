@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Проверка загрузчика — повтор танца</title>
+<style>
+  body { margin:0; font:14px system-ui; background:#ff9ac2 }
+  p { margin:0; padding:8px; text-align:center }
+  iframe { display:block; width:100%; height:calc(100svh - 50px); border:0 }
+</style>
+<p>Только QA: ролик повторяется, таймер — 120 с. <a href="../">Обычная версия</a></p>
+<iframe title="Проверка загрузчика"></iframe>
+<script>
+// Exercise the actual application, not a separately maintained DOM copy.
+// Only timing is changed so screenshots and keyboard checks fit between actions.
+fetch("../index.html").then((r) => r.text()).then((html) => {
+  const setup = `<script>
+    const nativeTimer = window.setTimeout.bind(window);
+    window.setTimeout = (fn, delay) => nativeTimer(fn, delay === 10000 ? 120000 : delay);
+    document.querySelector("video").loop = true;
+  <\/script>`;
+  document.querySelector("iframe").srcdoc = html
+    .replace("<head>", '<head><base href="../">')
+    .replace('<script src="app.js"></' + 'script>', setup + '<script src="app.js"></' + 'script>');
+});
+</script>
+</html>
